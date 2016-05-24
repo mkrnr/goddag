@@ -56,9 +56,8 @@ public class LeafNode extends Node implements Iterable<LeafNode> {
 
     @Override
     public String toString() {
-	String string = "LeafNode: " + this.label + " (";
+	String string = "LeafNode: \"" + this.label + "\" ";
 	string += super.toString();
-	string += ")";
 	return string;
     }
 

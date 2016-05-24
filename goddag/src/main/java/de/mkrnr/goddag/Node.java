@@ -119,6 +119,7 @@ public abstract class Node {
 	}
 	if (string.endsWith(", ")) {
 	    string = string.replaceAll(", $", "");
+	    string = "(" + string + ")";
 	}
 	return string;
     }

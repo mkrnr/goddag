@@ -190,4 +190,8 @@ public class Goddag {
 
 	return string;
     }
+
+    public Node getRootNode() {
+	return this.rootNode;
+    }
 }
