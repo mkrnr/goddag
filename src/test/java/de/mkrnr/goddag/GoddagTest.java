@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -29,15 +28,15 @@ public class GoddagTest {
     }
 
     private Goddag goddag;
-    private NonterminalNode<String> rootNode;
-    private ArrayList<LeafNode> leafNodes;
-    private ArrayList<NonterminalNode<String>> nonterminalNodes;
+    private Node rootNode;
+    private ArrayList<Node> leafNodes;
+    private ArrayList<Node> nonterminalNodes;
 
     @Test
     public void insertNodeBetweenBeginningTest() {
 
 	int childNodePosition = 0;
-	LeafNode childNode = this.leafNodes.get(childNodePosition);
+	Node childNode = this.leafNodes.get(childNodePosition);
 
 	this.addTwoNodesBetween(this.rootNode, childNode);
     }
@@ -46,7 +45,7 @@ public class GoddagTest {
     public void insertNodeBetweenEndTest() {
 
 	int childNodePosition = this.leafNodes.size() - 1;
-	LeafNode childNode = this.leafNodes.get(childNodePosition);
+	Node childNode = this.leafNodes.get(childNodePosition);
 
 	this.addTwoNodesBetween(this.rootNode, childNode);
     }
@@ -55,18 +54,9 @@ public class GoddagTest {
     public void insertNodeBetweenMiddleTest() {
 
 	int childNodePosition = 5;
-	LeafNode childNode = this.leafNodes.get(childNodePosition);
+	Node childNode = this.leafNodes.get(childNodePosition);
 
 	this.addTwoNodesBetween(this.rootNode, childNode);
-    }
-
-    @Test
-    public void leafNodeIteratorTest() {
-
-	Iterator<LeafNode> leafNodeIterator = this.goddag.getLeafNodeIterator();
-
-	this.checkLeafNodeIterator(leafNodeIterator, 10);
-
     }
 
     /**
@@ -77,11 +67,11 @@ public class GoddagTest {
 	this.goddag = new Goddag();
 	this.rootNode = this.goddag.createNonterminalNode("root");
 	this.goddag.setRootNode(this.rootNode);
-	this.leafNodes = new ArrayList<LeafNode>();
+	this.leafNodes = new ArrayList<Node>();
 	for (int i = 0; i < 10; i++) {
 	    this.leafNodes.add(this.goddag.createLeafNode("leaf " + i));
 	}
-	this.nonterminalNodes = new ArrayList<NonterminalNode<String>>();
+	this.nonterminalNodes = new ArrayList<Node>();
 	for (int i = 0; i < 10; i++) {
 	    this.nonterminalNodes.add(this.goddag.createNonterminalNode("leaf " + i));
 	}
@@ -99,35 +89,24 @@ public class GoddagTest {
     public void tearDown() throws Exception {
     }
 
-    private void addTwoNodesBetween(NonterminalNode<String> parentNode, LeafNode childNode) {
+    private void addTwoNodesBetween(Node parentNode, Node childNode) {
 
 	int childNodePosition = this.rootNode.getChildPosition(childNode);
 
-	NonterminalNode<String> firstNodeToAdd = this.nonterminalNodes.get(0);
+	Node firstNodeToAdd = this.nonterminalNodes.get(0);
 
 	this.goddag.insertNodeBetween(this.rootNode, childNode, firstNodeToAdd);
 
 	assertEquals(firstNodeToAdd, this.rootNode.getChildren().get(childNodePosition));
 	assertTrue(firstNodeToAdd.hasChild(childNode));
 
-	NonterminalNode<String> secondNodeToAdd = this.nonterminalNodes.get(1);
+	Node secondNodeToAdd = this.nonterminalNodes.get(1);
 
 	this.goddag.insertNodeBetween(this.rootNode, childNode, secondNodeToAdd);
 
 	assertEquals(secondNodeToAdd, this.rootNode.getChildren().get(childNodePosition + 1));
 	assertTrue(secondNodeToAdd.hasChild(childNode));
 
-    }
-
-    private void checkLeafNodeIterator(Iterator<LeafNode> leafNodeIterator, int expectedNumberOfLeafNodes) {
-
-	int actualNumberOfLeafNodes = 0;
-	while (leafNodeIterator.hasNext()) {
-	    actualNumberOfLeafNodes++;
-	    leafNodeIterator.next();
-	}
-
-	assertEquals(expectedNumberOfLeafNodes, actualNumberOfLeafNodes);
     }
 
 }

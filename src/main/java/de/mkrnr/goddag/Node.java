@@ -6,12 +6,13 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
 
-public abstract class Node {
+public class Node {
 
-    private ListOrderedSet<Node> parents;
-    private ListOrderedSet<Node> children;
-    private HashMap<String, String> properties;
-    private int id;
+    String label;
+    ListOrderedSet<Node> parents;
+    ListOrderedSet<Node> children;
+    HashMap<String, String> properties;
+    int id;
 
     public Node() {
 	this.parents = new ListOrderedSet<Node>();
@@ -20,9 +21,11 @@ public abstract class Node {
 	this.properties = new HashMap<String, String>();
     }
 
-    public Node(int id) {
+    public Node(String label, int id) {
 	this();
+	this.label = label;
 	this.id = id;
+
     }
 
     public void addChild(int childIndex, Node childNode) {
@@ -81,6 +84,10 @@ public abstract class Node {
 	}
     }
 
+    public String getLabel() {
+	return this.label;
+    }
+
     public Node getLastParent() {
 	if (this.parents.size() == 0) {
 	    return null;
@@ -105,8 +112,16 @@ public abstract class Node {
 	return this.children.contains(childNode);
     }
 
+    public boolean hasChildren() {
+	return this.children.isEmpty();
+    }
+
     public boolean hasParent(Node parentNode) {
 	return this.parents.contains(parentNode);
+    }
+
+    public boolean hasParents() {
+	return this.parents.isEmpty();
     }
 
     public boolean hasProperty(String key) {
@@ -116,13 +131,16 @@ public abstract class Node {
     @Override
     public String toString() {
 	String string = "";
+
+	string += this.label + " (";
+
 	for (Entry<String, String> property : this.getProperties().entrySet()) {
 	    string += property.getKey() + ":" + property.getValue() + ", ";
 	}
 	if (string.endsWith(", ")) {
 	    string = string.replaceAll(", $", "");
-	    string = "(" + string + ")";
 	}
+	string += ")";
 	return string;
     }
 

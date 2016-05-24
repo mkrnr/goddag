@@ -1,59 +1,57 @@
 package de.mkrnr.goddag;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 public class Goddag {
 
     public static void main(String[] args) {
 	Goddag goddag = new Goddag();
 
-	NonterminalNode<String> rootNode = goddag.createNonterminalNode("root");
+	Node rootNode = goddag.createNonterminalNode("root");
 	goddag.setRootNode(rootNode);
 
 	for (int i = 0; i < 10; i++) {
-	    LeafNode leafNode = goddag.createLeafNode(i + " test");
+	    Node leafNode = goddag.createLeafNode(i + " test");
 	    rootNode.addChild(leafNode);
 	}
 
-	LeafNode rootChildFive = (LeafNode) rootNode.getChildren().get(5);
-
-	NonterminalNode<String> firstNameNode1 = goddag.createNonterminalNode("firstName1");
+	Node firstNameNode1 = goddag.createNonterminalNode("firstName1");
 	firstNameNode1.addProperty("probability", "1.0");
-	goddag.insertNodeBetween(rootNode, rootChildFive, firstNameNode1);
+	goddag.insertNodeBetween(rootNode, rootNode.getChildren().get(5), firstNameNode1);
 
-	NonterminalNode<String> lastNameNode1 = goddag.createNonterminalNode("lastName1");
+	Node lastNameNode1 = goddag.createNonterminalNode("lastName1");
 	lastNameNode1.addProperty("probability", "0.5");
-	goddag.insertNodeBetween(rootNode, rootChildFive.getNextLeafNode(), lastNameNode1);
+	goddag.insertNodeBetween(rootNode, rootNode.getChildren().get(6), lastNameNode1);
 
-	NonterminalNode<String> firstNameNode2 = goddag.createNonterminalNode("firstName2");
+	Node firstNameNode2 = goddag.createNonterminalNode("firstName2");
 	firstNameNode2.addProperty("probability", "0.5");
-	goddag.insertNodeBetween(rootNode, rootChildFive.getNextLeafNode(), firstNameNode2);
+	goddag.insertNodeBetween(rootNode, rootNode.getChildren().get(6), firstNameNode2);
 
-	NonterminalNode<String> lastNameNode2 = goddag.createNonterminalNode("lastName2");
+	Node lastNameNode2 = goddag.createNonterminalNode("lastName2");
 	lastNameNode2.addProperty("probability", "1.0");
-	goddag.insertNodeBetween(rootNode, rootChildFive.getNextLeafNode().getNextLeafNode(), lastNameNode2);
+	goddag.insertNodeBetween(rootNode, rootNode.getChildren().get(7), lastNameNode2);
 
-	NonterminalNode<String> authorNode1 = goddag.createNonterminalNode("author1");
+	Node authorNode1 = goddag.createNonterminalNode("author1");
 	goddag.insertNodeBetween(rootNode, firstNameNode1, authorNode1);
 	goddag.insertNodeBetween(rootNode, lastNameNode1, authorNode1);
 
-	NonterminalNode<String> authorNode2 = goddag.createNonterminalNode("author2");
+	Node authorNode2 = goddag.createNonterminalNode("author2");
 	goddag.insertNodeBetween(rootNode, firstNameNode2, authorNode2);
 	goddag.insertNodeBetween(rootNode, lastNameNode2, authorNode2);
 
 	System.out.println(goddag);
     }
 
-    private ArrayList<Node> nodes;
-    private int currentId;
-    private LeafNode currentRightmostLeafNode;
-    private Node rootNode;
+    ArrayList<Node> nonterminalNodes;
+    ArrayList<Node> leafNodes;
+    Node rootNode;
+    int currentId;
 
     public Goddag() {
-	this.nodes = new ArrayList<Node>();
+	this.nonterminalNodes = new ArrayList<Node>();
 	this.currentId = 0;
-	this.currentRightmostLeafNode = null;
+	this.leafNodes = new ArrayList<Node>();
     }
 
     /**
@@ -64,22 +62,17 @@ public class Goddag {
      * @param label
      * @return created LeafNode
      */
-    public LeafNode createLeafNode(String label) {
-	LeafNode newLeafNode = new LeafNode(label, this.currentId++);
+    public Node createLeafNode(String label) {
+	Node leafNode = new Node(label, this.currentId++);
 
-	if (this.currentRightmostLeafNode != null) {
-	    this.currentRightmostLeafNode.setNextLeafNode(newLeafNode);
-	    newLeafNode.setPreviousLeafNode(this.currentRightmostLeafNode);
-	}
-	this.currentRightmostLeafNode = newLeafNode;
+	this.leafNodes.add(leafNode);
 
-	this.nodes.add(newLeafNode);
-	return newLeafNode;
+	return leafNode;
     }
 
-    public <T> NonterminalNode<T> createNonterminalNode(T label) {
-	NonterminalNode<T> nonterminalNode = new NonterminalNode<T>(label, this.currentId++);
-	this.nodes.add(nonterminalNode);
+    public Node createNonterminalNode(String label) {
+	Node nonterminalNode = new Node(label, this.currentId++);
+	this.nonterminalNodes.add(nonterminalNode);
 	return nonterminalNode;
     }
 
@@ -89,8 +82,8 @@ public class Goddag {
      * @return iterator if a LeafNode can be reached by following the leftmost
      *         children from the root
      */
-    public Iterator<LeafNode> getLeafNodeIterator() {
-	return this.getFirstLeafNode().iterator();
+    public List<Node> getLeafNodes() {
+	return this.leafNodes;
     }
 
     public Node getRootNode() {
@@ -107,7 +100,7 @@ public class Goddag {
      * @param childNode
      * @param nodeToAdd
      */
-    public <T> void insertNodeBetween(Node parentNode, Node childNode, NonterminalNode<T> nodeToAdd) {
+    public void insertNodeBetween(Node parentNode, Node childNode, Node nodeToAdd) {
 
 	int childNodeChildOfParentNodePosition = this.getChildOfParentNodePosition(childNode, parentNode);
 	int nodeToAddChildOfParentNodePosition = this.getChildOfParentNodePosition(nodeToAdd, parentNode);
@@ -167,17 +160,6 @@ public class Goddag {
 	    int position = parentNode.getChildPosition(childOfParentNodeOnPath);
 	    return position;
 	}
-    }
-
-    private LeafNode getFirstLeafNode() {
-	Node leftmostNode = this.rootNode;
-	while (!(leftmostNode instanceof LeafNode)) {
-	    leftmostNode = leftmostNode.getFirstChild();
-	    if (leftmostNode == null) {
-		return null;
-	    }
-	}
-	return (LeafNode) leftmostNode;
     }
 
     private String toString(Node currentNode, String offset) {
