@@ -11,6 +11,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class GoddagTest {
 
     /**
@@ -59,6 +62,22 @@ public class GoddagTest {
 	this.addTwoNodesBetween(this.rootNode, childNode);
     }
 
+    @Test
+    public void serializationTest() {
+
+	int childNodePosition = 5;
+	Node childNode = this.leafNodes.get(childNodePosition);
+
+	this.addTwoNodesBetween(this.rootNode, childNode);
+	GsonBuilder gsonBuilder = new GsonBuilder();
+	gsonBuilder.registerTypeAdapter(Goddag.class, new GoddagSerializer());
+	gsonBuilder.registerTypeAdapter(Node.class, new NodeSerializer());
+	Gson gson = gsonBuilder.create();
+
+	System.out.println(gson.toJson(this.goddag));
+
+    }
+
     /**
      * @throws java.lang.Exception
      */
@@ -73,7 +92,7 @@ public class GoddagTest {
 	}
 	this.nonterminalNodes = new ArrayList<Node>();
 	for (int i = 0; i < 10; i++) {
-	    this.nonterminalNodes.add(this.goddag.createNonterminalNode("leaf " + i));
+	    this.nonterminalNodes.add(this.goddag.createNonterminalNode("nonterminal " + i));
 	}
 
 	for (int i = 0; i < 10; i++) {

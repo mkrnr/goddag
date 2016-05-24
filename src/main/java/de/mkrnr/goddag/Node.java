@@ -113,7 +113,7 @@ public class Node {
     }
 
     public boolean hasChildren() {
-	return this.children.isEmpty();
+	return !this.children.isEmpty();
     }
 
     public boolean hasParent(Node parentNode) {
@@ -121,7 +121,11 @@ public class Node {
     }
 
     public boolean hasParents() {
-	return this.parents.isEmpty();
+	return !this.parents.isEmpty();
+    }
+
+    public boolean hasProperties() {
+	return !this.properties.isEmpty();
     }
 
     public boolean hasProperty(String key) {
