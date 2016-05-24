@@ -27,22 +27,32 @@ public abstract class Node {
 
     public void addChild(int childIndex, Node childNode) {
 	this.children.add(childIndex, childNode);
-	childNode.parents.add(this);
     }
 
     public void addChild(Node childNode) {
 	this.children.add(childNode);
-	childNode.parents.add(this);
+    }
+
+    public void addParent(int i, Node nodeToAdd) {
+	this.parents.add(i, nodeToAdd);
+
     }
 
     public void addParent(Node parentNode) {
 	this.parents.add(parentNode);
-	parentNode.children.add(this);
     }
 
     public void addProperty(String key, String value) {
 	this.properties.put(key, value);
 
+    }
+
+    public boolean disconnectChild(Node childNode) {
+	return this.children.remove(childNode) && childNode.parents.remove(this);
+    }
+
+    public boolean disconnectParent(Node parentNode) {
+	return this.parents.remove(parentNode) && parentNode.children.remove(this);
     }
 
     @Override
@@ -101,14 +111,6 @@ public abstract class Node {
 
     public boolean hasProperty(String key) {
 	return this.properties.containsKey(key);
-    }
-
-    public boolean removeChild(Node childNode) {
-	return this.children.remove(childNode) && childNode.parents.remove(this);
-    }
-
-    public boolean removeParent(Node parentNode) {
-	return this.parents.remove(parentNode) && parentNode.children.remove(this);
     }
 
     @Override

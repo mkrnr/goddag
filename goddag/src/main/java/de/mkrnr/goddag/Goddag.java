@@ -2,7 +2,6 @@ package de.mkrnr.goddag;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class Goddag {
 
@@ -70,6 +69,7 @@ public class Goddag {
 
 	if (this.currentRightmostLeafNode != null) {
 	    this.currentRightmostLeafNode.setNextLeafNode(newLeafNode);
+	    newLeafNode.setPreviousLeafNode(this.currentRightmostLeafNode);
 	}
 	this.currentRightmostLeafNode = newLeafNode;
 
@@ -93,15 +93,13 @@ public class Goddag {
 	return this.getFirstLeafNode().iterator();
     }
 
+    public Node getRootNode() {
+	return this.rootNode;
+    }
+
     /**
      *
      * Inserts nodeToAdd between parentNode and childNode. <br>
-     * If parentNode and childNode are connected by an edge, this edge is
-     * removed. At the position of childNode, nodeToAdd is inserted and
-     * childNode is set as child node of nodeToAdd <br>
-     * If parentNode and childNode are not connected by an edge, nodeToAdd is
-     * added after the last child of parentNode that is on a path from
-     * parentNode to childNode
      *
      * @param <T>
      *
@@ -111,42 +109,32 @@ public class Goddag {
      */
     public <T> void insertNodeBetween(Node parentNode, Node childNode, NonterminalNode<T> nodeToAdd) {
 
-	// check if parentNode has childNode as child
-	if (parentNode.hasChild(childNode)) {
-	    // if yes, get position of child in parent node
-	    int childPosition = parentNode.getChildPosition(childNode);
-	    // remove the child
-	    parentNode.removeChild(childNode);
-	    // insert nodeToAdd at the old position of childNode
-	    parentNode.addChild(childPosition, nodeToAdd);
-	} else {
-	    // if not, check if there is path from parentNode to childNode
-	    Node childOfParentNodeOnPath = childNode;
-	    do {
-		childOfParentNodeOnPath = childOfParentNodeOnPath.getLastParent();
-		if (childOfParentNodeOnPath == null) {
-		    // there is no path from parentNode to childNode
+	int childNodeChildOfParentNodePosition = this.getChildOfParentNodePosition(childNode, parentNode);
+	int nodeToAddChildOfParentNodePosition = this.getChildOfParentNodePosition(nodeToAdd, parentNode);
 
-		    // thereby, remove links from all ancestors of parentNode to
-		    // childNode
-		    this.removeLinksToAncestors(parentNode.getParents(), childNode);
-		    break;
-		}
-	    } while (!childOfParentNodeOnPath.hasParent(parentNode));
+	if (nodeToAddChildOfParentNodePosition < childNodeChildOfParentNodePosition) {
+	    // nodeToAdd is added to left of the current path of childNode
+	    nodeToAdd.addChild(childNode);
+	    childNode.addParent(0, nodeToAdd);
 
-	    int nodeToAddPosition;
-	    if (childOfParentNodeOnPath == null) {
-		// there was no path from parentNode to childNode
-		// thereby, set nodeToAddPosition to index of last child + 1
-		nodeToAddPosition = parentNode.getChildren().size();
-	    } else {
-		// there was a path from parentNode to childNode
-		// thereby, set nodeToAddPosition to childOfParentNodeOnPath +1
-		nodeToAddPosition = parentNode.getChildPosition(childOfParentNodeOnPath) + 1;
+	    if (!parentNode.hasChild(nodeToAdd)) {
+		parentNode.addChild(childNodeChildOfParentNodePosition, nodeToAdd);
+		nodeToAdd.addParent(parentNode);
 	    }
-	    parentNode.addChild(nodeToAddPosition, nodeToAdd);
+	} else {
+	    // nodeToAdd is added to right of the current path of childNode
+	    nodeToAdd.addChild(0, childNode);
+	    childNode.addParent(nodeToAdd);
+	    if (!parentNode.hasChild(nodeToAdd)) {
+		parentNode.addChild(childNodeChildOfParentNodePosition + 1, nodeToAdd);
+		nodeToAdd.addParent(parentNode);
+	    }
 	}
-	nodeToAdd.addChild(childNode);
+
+	if (parentNode.hasChild(childNode)) {
+	    parentNode.disconnectChild(childNode);
+	}
+
     }
 
     public void setRootNode(Node rootNode) {
@@ -160,6 +148,27 @@ public class Goddag {
 	return goddagString;
     }
 
+    /**
+     * Get the position in which a node has to be added between childNode and
+     * parentNode as a child of parentNode
+     *
+     * @param childNode
+     * @param parentNode
+     * @return
+     */
+    private int getChildOfParentNodePosition(Node childNode, Node parentNode) {
+	Node childOfParentNodeOnPath = childNode;
+	while ((childOfParentNodeOnPath != null) && !parentNode.hasChild(childOfParentNodeOnPath)) {
+	    childOfParentNodeOnPath = childOfParentNodeOnPath.getLastParent();
+	}
+	if (childOfParentNodeOnPath == null) {
+	    return parentNode.getChildren().size() - 1;
+	} else {
+	    int position = parentNode.getChildPosition(childOfParentNodeOnPath);
+	    return position;
+	}
+    }
+
     private LeafNode getFirstLeafNode() {
 	Node leftmostNode = this.rootNode;
 	while (!(leftmostNode instanceof LeafNode)) {
@@ -171,17 +180,6 @@ public class Goddag {
 	return (LeafNode) leftmostNode;
     }
 
-    private void removeLinksToAncestors(List<Node> ancestors, Node childNode) {
-	// iterate over ancestors of parentNode to remove all connections to
-	// childNode
-	for (Node ancestor : ancestors) {
-	    if (ancestor.hasChild(childNode)) {
-		ancestor.removeChild(childNode);
-	    }
-	    this.removeLinksToAncestors(ancestor.getParents(), childNode);
-	}
-    }
-
     private String toString(Node currentNode, String offset) {
 	String string = offset + currentNode.toString() + "\n";
 	for (Node child : currentNode.getChildren()) {
@@ -189,9 +187,5 @@ public class Goddag {
 	}
 
 	return string;
-    }
-
-    public Node getRootNode() {
-	return this.rootNode;
     }
 }

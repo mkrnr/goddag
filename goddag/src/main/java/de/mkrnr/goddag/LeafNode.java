@@ -6,6 +6,7 @@ public class LeafNode extends Node implements Iterable<LeafNode> {
 
     private String label;
     private LeafNode nextLeafNode;
+    private LeafNode previousLeafNode;
 
     public LeafNode(String label, int id) {
 	super(id);
@@ -20,8 +21,16 @@ public class LeafNode extends Node implements Iterable<LeafNode> {
 	return this.nextLeafNode;
     }
 
+    public LeafNode getPreviousLeafNode() {
+	return this.previousLeafNode;
+    }
+
     public boolean hasNextLeafNode() {
 	return null != this.nextLeafNode;
+    }
+
+    public boolean hasPreviousLeafNode() {
+	return null != this.previousLeafNode;
     }
 
     public Iterator<LeafNode> iterator() {
@@ -52,6 +61,11 @@ public class LeafNode extends Node implements Iterable<LeafNode> {
 
     public void setNextLeafNode(LeafNode nextLeafNode) {
 	this.nextLeafNode = nextLeafNode;
+    }
+
+    public void setPreviousLeafNode(LeafNode previousLeafNode) {
+	this.previousLeafNode = previousLeafNode;
+
     }
 
     @Override

@@ -15,7 +15,7 @@ public class NonterminalNode<T> extends Node {
 
     @Override
     public String toString() {
-	String string = this.type + " Node";
+	String string = this.type + "Node";
 	string += super.toString();
 	return string;
     }
