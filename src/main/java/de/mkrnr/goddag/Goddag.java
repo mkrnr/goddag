@@ -1,9 +1,31 @@
 package de.mkrnr.goddag;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 public class Goddag {
+
+    public static JsonSerializer<Goddag> getJsonSerializer() {
+
+	return new JsonSerializer<Goddag>() {
+
+	    public JsonElement serialize(Goddag src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject obj = new JsonObject();
+		obj.add("nonterminalNodes", context.serialize(src.nonterminalNodes));
+		obj.add("leafNodes", context.serialize(src.leafNodes));
+		obj.addProperty("rootNode", src.rootNode.getId());
+		obj.addProperty("currentId", src.currentId);
+
+		return obj;
+	    }
+	};
+    }
 
     public static void main(String[] args) {
 	Goddag goddag = new Goddag();
@@ -43,10 +65,11 @@ public class Goddag {
 	System.out.println(goddag);
     }
 
-    ArrayList<Node> nonterminalNodes;
-    ArrayList<Node> leafNodes;
-    Node rootNode;
-    int currentId;
+    private ArrayList<Node> nonterminalNodes;
+    private ArrayList<Node> leafNodes;
+    private Node rootNode;
+
+    private int currentId;
 
     public Goddag() {
 	this.nonterminalNodes = new ArrayList<Node>();
