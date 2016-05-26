@@ -70,6 +70,7 @@ public class GoddagTest {
 
 	this.addTwoNodesBetween(this.rootNode, childNode);
 	GsonBuilder gsonBuilder = new GsonBuilder();
+	gsonBuilder.setPrettyPrinting();
 	gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonSerializer());
 	gsonBuilder.registerTypeAdapter(Node.class, Node.getJsonSerializer());
 	Gson gson = gsonBuilder.create();
