@@ -14,18 +14,18 @@ public class Node {
     HashMap<String, String> properties;
     int id;
 
-    public Node() {
-	this.parents = new ListOrderedSet<Node>();
-	this.children = new ListOrderedSet<Node>();
-
-	this.properties = new HashMap<String, String>();
-    }
-
     public Node(String label, int id) {
 	this();
 	this.label = label;
 	this.id = id;
 
+    }
+
+    private Node() {
+	this.parents = new ListOrderedSet<Node>();
+	this.children = new ListOrderedSet<Node>();
+
+	this.properties = new HashMap<String, String>();
     }
 
     public void addChild(int childIndex, Node childNode) {
@@ -82,6 +82,10 @@ public class Node {
 	} else {
 	    return this.children.get(0);
 	}
+    }
+
+    public int getId() {
+	return this.id;
     }
 
     public String getLabel() {
@@ -146,10 +150,6 @@ public class Node {
 	}
 	string += ")";
 	return string;
-    }
-
-    private int getId() {
-	return this.id;
     }
 
 }
