@@ -72,10 +72,18 @@ public class GoddagTest {
 	GsonBuilder gsonBuilder = new GsonBuilder();
 	gsonBuilder.setPrettyPrinting();
 	gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonSerializer());
+	gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonDeserializer());
 	gsonBuilder.registerTypeAdapter(Node.class, Node.getJsonSerializer());
 	Gson gson = gsonBuilder.create();
 
-	System.out.println(gson.toJson(this.goddag));
+	String goddagAsJsonString = gson.toJson(this.goddag);
+	System.out.println("serialized goddag:");
+	System.out.println(goddagAsJsonString);
+
+	Goddag deserializedGoddag = gson.fromJson(goddagAsJsonString, Goddag.class);
+	System.out.println();
+	System.out.println("deserialized goddag:");
+	System.out.println(deserializedGoddag);
 
     }
 
@@ -89,7 +97,10 @@ public class GoddagTest {
 	this.goddag.setRootNode(this.rootNode);
 	this.leafNodes = new ArrayList<Node>();
 	for (int i = 0; i < 10; i++) {
-	    this.leafNodes.add(this.goddag.createLeafNode("leaf " + i));
+	    Node leafNode = this.goddag.createLeafNode("leaf " + i);
+	    leafNode.addProperty("p1", "0.5");
+	    leafNode.addProperty("p2", "0.8");
+	    this.leafNodes.add(leafNode);
 	}
 	this.nonterminalNodes = new ArrayList<Node>();
 	for (int i = 0; i < 10; i++) {

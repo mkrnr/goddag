@@ -2,14 +2,90 @@ package de.mkrnr.goddag;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 public class Goddag {
+
+    public static JsonDeserializer<Goddag> getJsonDeserializer() {
+
+	return new JsonDeserializer<Goddag>() {
+
+	    private Map<Integer, Node> nodes;
+
+	    public Goddag deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context)
+		    throws JsonParseException {
+		this.nodes = new HashMap<Integer, Node>();
+
+		JsonObject jsonObject = (JsonObject) src;
+
+		List<Node> nonterminalNodes = this.getNodes(jsonObject, "nonterminalNodes");
+		List<Node> leafNodes = this.getNodes(jsonObject, "leafNodes");
+		Node rootNode = this.nodes.get(jsonObject.get("rootNode").getAsInt());
+		int currentId = jsonObject.get("currentId").getAsInt();
+
+		return new Goddag(nonterminalNodes, leafNodes, rootNode, currentId);
+	    }
+
+	    private List<Node> getNodes(JsonObject jsonObject, String nodesName) {
+		List<Node> newNodes = new ArrayList<Node>();
+		for (JsonElement nodeElement : jsonObject.get(nodesName).getAsJsonArray()) {
+		    JsonObject nodeObject = nodeElement.getAsJsonObject();
+		    int id = nodeObject.get("id").getAsInt();
+		    Node newNode;
+		    if (this.nodes.containsKey(id)) {
+			newNode = this.nodes.get(id);
+		    } else {
+			newNode = new Node(id);
+			this.nodes.put(id, newNode);
+		    }
+		    newNodes.add(newNode);
+		    newNode.setLabel(nodeObject.get("label").getAsString());
+
+		    newNode.addChildren(this.getNodesFromIdArray(nodeObject, "children"));
+		    newNode.addParents(this.getNodesFromIdArray(nodeObject, "parents"));
+
+		    Map<String, String> properties = new HashMap<String, String>();
+
+		    if (nodeObject.has("properties")) {
+			JsonObject propertiesObject = nodeObject.get("properties").getAsJsonObject();
+			for (Entry<String, JsonElement> property : propertiesObject.entrySet()) {
+			    properties.put(property.getKey(), property.getValue().getAsString());
+			}
+		    }
+		}
+		return newNodes;
+	    }
+
+	    private List<Node> getNodesFromIdArray(JsonObject nodeObject, String jsonArrayName) {
+		List<Node> nodesFromId = new ArrayList<Node>();
+		if (nodeObject.has(jsonArrayName)) {
+		    for (JsonElement elementOfJsonArray : nodeObject.get(jsonArrayName).getAsJsonArray()) {
+			int elementId = elementOfJsonArray.getAsInt();
+			Node elementNode;
+			if (this.nodes.containsKey(elementId)) {
+			    elementNode = this.nodes.get(elementId);
+			} else {
+			    elementNode = new Node(elementId);
+			    this.nodes.put(elementId, elementNode);
+			}
+			nodesFromId.add(elementNode);
+		    }
+		}
+		return nodesFromId;
+	    }
+	};
+    }
 
     public static JsonSerializer<Goddag> getJsonSerializer() {
 
@@ -65,8 +141,8 @@ public class Goddag {
 	System.out.println(goddag);
     }
 
-    private ArrayList<Node> nonterminalNodes;
-    private ArrayList<Node> leafNodes;
+    private List<Node> nonterminalNodes;
+    private List<Node> leafNodes;
     private Node rootNode;
 
     private int currentId;
@@ -75,6 +151,13 @@ public class Goddag {
 	this.nonterminalNodes = new ArrayList<Node>();
 	this.currentId = 0;
 	this.leafNodes = new ArrayList<Node>();
+    }
+
+    public Goddag(List<Node> nonterminalNodes, List<Node> leafNodes, Node rootNode, int currentId) {
+	this.nonterminalNodes = nonterminalNodes;
+	this.leafNodes = leafNodes;
+	this.rootNode = rootNode;
+	this.currentId = currentId;
     }
 
     /**

@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
@@ -53,10 +54,22 @@ public class Node {
 
     private int id;
 
-    public Node(String label, int id) {
+    public Node(int id) {
 	this();
-	this.label = label;
 	this.id = id;
+    }
+
+    public Node(List<Node> parents, List<Node> children, Map<String, String> properties, String label, int id) {
+	this(label, id);
+	this.parents.addAll(parents);
+	this.children.addAll(children);
+	this.properties.putAll(properties);
+
+    }
+
+    public Node(String label, int id) {
+	this(id);
+	this.label = label;
 
     }
 
@@ -75,6 +88,10 @@ public class Node {
 	this.children.add(childNode);
     }
 
+    public void addChildren(List<Node> newChildren) {
+	this.children.addAll(newChildren);
+    }
+
     public void addParent(int i, Node nodeToAdd) {
 	this.parents.add(i, nodeToAdd);
 
@@ -82,6 +99,10 @@ public class Node {
 
     public void addParent(Node parentNode) {
 	this.parents.add(parentNode);
+    }
+
+    public void addParents(List<Node> newParents) {
+	this.parents.addAll(newParents);
     }
 
     public void addProperty(String key, String value) {
@@ -173,6 +194,11 @@ public class Node {
 
     public boolean hasProperty(String key) {
 	return this.properties.containsKey(key);
+    }
+
+    public void setLabel(String label) {
+	this.label = label;
+
     }
 
     @Override
