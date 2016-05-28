@@ -75,16 +75,7 @@ public class GoddagVisualizer {
 	this.graphNodes = new HashMap<Integer, GraphNode>();
 	this.graph.addAttribute("ui.stylesheet", this.styleSheet);
 
-	// Viewer viewer = this.graph.display(false);
-	// viewer.disableAutoLayout();
-
-	// View view = viewer.getDefaultView();
-	// view.getCamera().setAutoFitView(true);
-	// this.graph.addAttribute("ui.screenshot",
-	// "/home/martin/graph-screenshot.png");
-
 	this.numberOfLeaves = goddag.getLeafNodes().size();
-	System.out.println("number of leaves" + this.numberOfLeaves);
 
 	Node rootNode = goddag.getRootNode();
 
@@ -97,8 +88,7 @@ public class GoddagVisualizer {
 	// view.resizeFrame(800, 600);
 	view.getCamera().setViewCenter(rootGraphNode.getX(), 0, 0);
 	double viewPercent = (double) 10 / this.numberOfLeaves;
-	// viewPercent = 0.001;
-	System.out.println(viewPercent);
+
 	view.getCamera().setViewPercent(viewPercent);
 
     }
@@ -118,7 +108,6 @@ public class GoddagVisualizer {
 	    return this.graphNodes.get(node.getId());
 	} else {
 	    org.graphstream.graph.Node graphStreamNode = this.graph.addNode(String.valueOf(node.getId()));
-	    System.out.println("add " + node.toString() + " x: " + x + ", y:" + y);
 	    graphStreamNode.addAttribute("ui.label", node.getLabel());
 	    graphStreamNode.addAttribute("x", x);
 	    graphStreamNode.addAttribute("y", y);
@@ -139,7 +128,6 @@ public class GoddagVisualizer {
 	    GraphNode childGraphNode = this.addNode(childNode, x, y);
 	    this.addEdge(parentGraphNode, childGraphNode);
 	    this.addNodeChildren(goddag, childGraphNode, y - 1);
-	    System.out.println(this.numberOfLeaves);
 	    x += 1;
 	}
     }

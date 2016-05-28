@@ -23,6 +23,7 @@ public class Goddag {
 
 	    private Map<Integer, Node> nodes;
 
+	    @Override
 	    public Goddag deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context)
 		    throws JsonParseException {
 		this.nodes = new HashMap<Integer, Node>();
@@ -55,12 +56,10 @@ public class Goddag {
 		    newNode.addChildren(this.getNodesFromIdArray(nodeObject, "children"));
 		    newNode.addParents(this.getNodesFromIdArray(nodeObject, "parents"));
 
-		    Map<String, String> properties = new HashMap<String, String>();
-
 		    if (nodeObject.has("properties")) {
 			JsonObject propertiesObject = nodeObject.get("properties").getAsJsonObject();
 			for (Entry<String, JsonElement> property : propertiesObject.entrySet()) {
-			    properties.put(property.getKey(), property.getValue().getAsString());
+			    newNode.addProperty(property.getKey(), property.getValue().getAsString());
 			}
 		    }
 		}
@@ -91,6 +90,7 @@ public class Goddag {
 
 	return new JsonSerializer<Goddag>() {
 
+	    @Override
 	    public JsonElement serialize(Goddag src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject obj = new JsonObject();
 		obj.add("nonterminalNodes", context.serialize(src.nonterminalNodes));
