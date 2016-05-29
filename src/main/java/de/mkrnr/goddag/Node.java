@@ -4,7 +4,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
@@ -19,6 +18,7 @@ public class Node {
     public static JsonSerializer<Node> getJsonSerializer() {
 
 	return new JsonSerializer<Node>() {
+	    @Override
 	    public JsonElement serialize(Node src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("label", src.label.toString());
@@ -57,14 +57,6 @@ public class Node {
     public Node(int id) {
 	this();
 	this.id = id;
-    }
-
-    public Node(List<Node> parents, List<Node> children, Map<String, String> properties, String label, int id) {
-	this(label, id);
-	this.parents.addAll(parents);
-	this.children.addAll(children);
-	this.properties.putAll(properties);
-
     }
 
     public Node(String label, int id) {
