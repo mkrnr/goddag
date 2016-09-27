@@ -38,52 +38,52 @@ public class GoddagTest {
     @Test
     public void insertNodeBetweenBeginningTest() {
 
-	int childNodePosition = 0;
-	Node childNode = this.leafNodes.get(childNodePosition);
+        int childNodePosition = 0;
+        Node childNode = this.leafNodes.get(childNodePosition);
 
-	this.addTwoNodesBetween(this.rootNode, childNode);
+        this.addTwoNodesBetween(this.rootNode, childNode);
     }
 
     @Test
     public void insertNodeBetweenEndTest() {
 
-	int childNodePosition = this.leafNodes.size() - 1;
-	Node childNode = this.leafNodes.get(childNodePosition);
+        int childNodePosition = this.leafNodes.size() - 1;
+        Node childNode = this.leafNodes.get(childNodePosition);
 
-	this.addTwoNodesBetween(this.rootNode, childNode);
+        this.addTwoNodesBetween(this.rootNode, childNode);
     }
 
     @Test
     public void insertNodeBetweenMiddleTest() {
 
-	int childNodePosition = 5;
-	Node childNode = this.leafNodes.get(childNodePosition);
+        int childNodePosition = 5;
+        Node childNode = this.leafNodes.get(childNodePosition);
 
-	this.addTwoNodesBetween(this.rootNode, childNode);
+        this.addTwoNodesBetween(this.rootNode, childNode);
     }
 
     @Test
     public void serializationTest() {
 
-	int childNodePosition = 5;
-	Node childNode = this.leafNodes.get(childNodePosition);
+        int childNodePosition = 5;
+        Node childNode = this.leafNodes.get(childNodePosition);
 
-	this.addTwoNodesBetween(this.rootNode, childNode);
-	GsonBuilder gsonBuilder = new GsonBuilder();
-	gsonBuilder.setPrettyPrinting();
-	gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonSerializer());
-	gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonDeserializer());
-	gsonBuilder.registerTypeAdapter(Node.class, Node.getJsonSerializer());
-	Gson gson = gsonBuilder.create();
+        this.addTwoNodesBetween(this.rootNode, childNode);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonSerializer());
+        gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonDeserializer());
+        gsonBuilder.registerTypeAdapter(Node.class, Node.getJsonSerializer());
+        Gson gson = gsonBuilder.create();
 
-	String goddagAsJsonString = gson.toJson(this.goddag);
-	System.out.println("serialized goddag:");
-	System.out.println(goddagAsJsonString);
+        String goddagAsJsonString = gson.toJson(this.goddag);
+        System.out.println("serialized goddag:");
+        System.out.println(goddagAsJsonString);
 
-	Goddag deserializedGoddag = gson.fromJson(goddagAsJsonString, Goddag.class);
-	System.out.println();
-	System.out.println("deserialized goddag:");
-	System.out.println(deserializedGoddag);
+        Goddag deserializedGoddag = gson.fromJson(goddagAsJsonString, Goddag.class);
+        System.out.println();
+        System.out.println("deserialized goddag:");
+        System.out.println(deserializedGoddag);
 
     }
 
@@ -92,24 +92,24 @@ public class GoddagTest {
      */
     @Before
     public void setUp() throws Exception {
-	this.goddag = new Goddag();
-	this.rootNode = this.goddag.createNonterminalNode("root");
-	this.goddag.setRootNode(this.rootNode);
-	this.leafNodes = new ArrayList<Node>();
-	for (int i = 0; i < 10; i++) {
-	    Node leafNode = this.goddag.createLeafNode("leaf " + i);
-	    leafNode.addProperty("p1", "0.5");
-	    leafNode.addProperty("p2", "0.8");
-	    this.leafNodes.add(leafNode);
-	}
-	this.nonterminalNodes = new ArrayList<Node>();
-	for (int i = 0; i < 10; i++) {
-	    this.nonterminalNodes.add(this.goddag.createNonterminalNode("nonterminal " + i));
-	}
+        this.goddag = new Goddag();
+        this.rootNode = this.goddag.createNonterminalNode("root");
+        this.goddag.setRootNode(this.rootNode);
+        this.leafNodes = new ArrayList<Node>();
+        for (int i = 0; i < 10; i++) {
+            Node leafNode = this.goddag.createLeafNode("leaf " + i);
+            leafNode.addProperty("p1", "0.5");
+            leafNode.addProperty("p2", "0.8");
+            this.leafNodes.add(leafNode);
+        }
+        this.nonterminalNodes = new ArrayList<Node>();
+        for (int i = 0; i < 10; i++) {
+            this.nonterminalNodes.add(this.goddag.createNonterminalNode("nonterminal " + i));
+        }
 
-	for (int i = 0; i < 10; i++) {
-	    this.rootNode.addChild(this.leafNodes.get(i));
-	}
+        for (int i = 0; i < 10; i++) {
+            this.rootNode.addChild(this.leafNodes.get(i));
+        }
 
     }
 
@@ -122,21 +122,21 @@ public class GoddagTest {
 
     private void addTwoNodesBetween(Node parentNode, Node childNode) {
 
-	int childNodePosition = this.rootNode.getChildPosition(childNode);
+        int childNodePosition = this.rootNode.getChildPosition(childNode);
 
-	Node firstNodeToAdd = this.nonterminalNodes.get(0);
+        Node firstNodeToAdd = this.nonterminalNodes.get(0);
 
-	this.goddag.insertNodeBetween(this.rootNode, childNode, firstNodeToAdd);
+        this.goddag.insertNodeBetween(this.rootNode, childNode, firstNodeToAdd);
 
-	assertEquals(firstNodeToAdd, this.rootNode.getChildren().get(childNodePosition));
-	assertTrue(firstNodeToAdd.hasChild(childNode));
+        assertEquals(firstNodeToAdd, this.rootNode.getChildren().get(childNodePosition));
+        assertTrue(firstNodeToAdd.hasChild(childNode));
 
-	Node secondNodeToAdd = this.nonterminalNodes.get(1);
+        Node secondNodeToAdd = this.nonterminalNodes.get(1);
 
-	this.goddag.insertNodeBetween(this.rootNode, childNode, secondNodeToAdd);
+        this.goddag.insertNodeBetween(this.rootNode, childNode, secondNodeToAdd);
 
-	assertEquals(secondNodeToAdd, this.rootNode.getChildren().get(childNodePosition + 1));
-	assertTrue(secondNodeToAdd.hasChild(childNode));
+        assertEquals(secondNodeToAdd, this.rootNode.getChildren().get(childNodePosition + 1));
+        assertTrue(secondNodeToAdd.hasChild(childNode));
 
     }
 
