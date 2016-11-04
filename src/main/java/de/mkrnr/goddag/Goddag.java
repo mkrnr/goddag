@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.collections4.set.ListOrderedSet;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -138,24 +142,41 @@ public class Goddag {
         goddag.insertNodeBetween(rootNode, firstNameNode2, authorNode2);
         goddag.insertNodeBetween(rootNode, lastNameNode2, authorNode2);
 
-        System.out.println(goddag);
+        goddag.deleteNode(lastNameNode2);
+
+        // System.out.println(goddag);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonSerializer());
+        gsonBuilder.registerTypeAdapter(Node.class, Node.getJsonSerializer());
+        gsonBuilder.registerTypeAdapter(Goddag.class, Goddag.getJsonDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        String goddagString = gson.toJson(goddag);
+        System.out.println(goddagString);
+        Goddag newGoddag = gson.fromJson(goddagString, Goddag.class);
+        System.out.println(newGoddag);
+
     }
 
-    private List<Node> nonterminalNodes;
-    private List<Node> leafNodes;
+    private ListOrderedSet<Node> nonterminalNodes;
+    private ListOrderedSet<Node> leafNodes;
     private Node rootNode;
 
     private int currentId;
 
     public Goddag() {
-        this.nonterminalNodes = new ArrayList<Node>();
+        this.nonterminalNodes = new ListOrderedSet<Node>();
         this.currentId = 0;
-        this.leafNodes = new ArrayList<Node>();
+        this.leafNodes = new ListOrderedSet<Node>();
     }
 
     public Goddag(List<Node> nonterminalNodes, List<Node> leafNodes, Node rootNode, int currentId) {
-        this.nonterminalNodes = nonterminalNodes;
-        this.leafNodes = leafNodes;
+        this.nonterminalNodes = new ListOrderedSet<Node>();
+        this.nonterminalNodes.addAll(nonterminalNodes);
+
+        this.leafNodes = new ListOrderedSet<Node>();
+        this.leafNodes.addAll(leafNodes);
         this.rootNode = rootNode;
         this.currentId = currentId;
     }
@@ -183,13 +204,32 @@ public class Goddag {
     }
 
     /**
+     * Deletes a node after connecting all parents with all children
+     *
+     * @param nodeToDelete
+     */
+    public void deleteNode(Node nodeToDelete) {
+
+        for (Node parentNode : nodeToDelete.getParents()) {
+            for (Node childNode : nodeToDelete.getChildren()) {
+                parentNode.removeChild(nodeToDelete);
+                childNode.removeParent(nodeToDelete);
+                parentNode.addChild(childNode);
+            }
+        }
+        // TODO add node deletion
+        this.leafNodes.remove(nodeToDelete);
+        this.nonterminalNodes.remove(nodeToDelete);
+    }
+
+    /**
      * Get iterator that starts at the leftmost LeafNode
      *
      * @return iterator if a LeafNode can be reached by following the leftmost
      *         children from the root
      */
     public List<Node> getLeafNodes() {
-        return this.leafNodes;
+        return this.leafNodes.asList();
     }
 
     public Node getRootNode() {

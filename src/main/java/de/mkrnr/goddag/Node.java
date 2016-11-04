@@ -86,7 +86,6 @@ public class Node {
 
     public void addParent(int i, Node nodeToAdd) {
         this.parents.add(i, nodeToAdd);
-
     }
 
     public void addParent(Node parentNode) {
@@ -186,6 +185,14 @@ public class Node {
 
     public boolean hasProperty(String key) {
         return this.properties.containsKey(key);
+    }
+
+    public void removeChild(Node childNode) {
+        this.children.remove(childNode);
+    }
+
+    public void removeParent(Node parentNode) {
+        this.parents.remove(parentNode);
     }
 
     public void setLabel(String label) {
