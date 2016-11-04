@@ -181,6 +181,14 @@ public class Goddag {
         this.currentId = currentId;
     }
 
+    public boolean containsLeafNode(Node node) {
+        return this.leafNodes.contains(node);
+    }
+
+    public boolean containsNonTerminalNode(Node childNode) {
+        return this.nonterminalNodes.contains(childNode);
+    }
+
     /**
      * Creates a LeafNode without adding any edges <br>
      * The newly creates LeafNode gets interlinked with the currently right most
